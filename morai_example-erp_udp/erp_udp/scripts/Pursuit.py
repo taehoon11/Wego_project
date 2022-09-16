@@ -3,7 +3,7 @@
 import sys
 import numpy as np
 from lib.morai_udp_parser import udp_parser,udp_sender
-from lib.utils import pathReader,findLocalPath,purePursuit,Point,my_pure_pursuit
+from lib.Taehoon_utils import pathReader,findLocalPath,purePursuit,Point
 from math import cos,sin,sqrt,pow,atan2,pi
 import time
 import threading
@@ -65,9 +65,12 @@ class planner2 :
 
     
         local_path,current_point =findLocalPath(self.global_path,position_x,position_y)
+        #####
+        self.pure_pursuit.getPath(local_path)
+        self.pure_pursuit.getEgoStatus(position_x,position_y,position_z,velocity,heading)
+
         
-        
-        
+
         ctrl_mode = 2 # 2 = AutoMode / 1 = KeyBoard
         Gear = 4 # 4 1 : (P / parking ) 2 (R / reverse) 3 (N / Neutral)  4 : (D / Drive) 5 : (L)
 
@@ -78,10 +81,12 @@ class planner2 :
         accel=1
         brake=0
 
-        #steering_angle=my_pure_pursuit() # deg
-        steering_angle = my_pure_pursuit(position_x,position_y,local_path,heading,velocity)
-        print(steering_angle)
+        steering_angle=self.pure_pursuit.steering_angle() # deg
+        #print(steering_angle)
+        
         self.ctrl_cmd.send_data([ctrl_mode,Gear,cmd_type,send_velocity,acceleration,accel,brake,steering_angle])
+        
+
         
 
 

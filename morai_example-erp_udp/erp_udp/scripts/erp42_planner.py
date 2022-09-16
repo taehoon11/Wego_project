@@ -86,7 +86,7 @@ class planner :
         brake=0
 
         steering_angle=self.pure_pursuit.steering_angle() # deg
-        print(steering_angle)
+        #print(steering_angle)
         
         self.ctrl_cmd.send_data([ctrl_mode,Gear,cmd_type,send_velocity,acceleration,accel,brake,steering_angle])
         

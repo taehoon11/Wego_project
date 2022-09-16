@@ -1,5 +1,6 @@
 import os
-from math import cos,sin,sqrt,pow,atan2,pi
+import numpy as np
+from math import cos,sin,sqrt,pow,atan2,acos,pi
 
 class Point() :
     def __init__(self):
@@ -66,21 +67,17 @@ class purePursuit :
 
     def steering_angle(self):
         vehicle_position=self.current_postion
-        rotated_point=Point()
         self.is_look_forward_point= False
-
-
+        mag = float("inf")
         for i in self.path :
-            path_point=i
-            dx= i[0] - vehicle_position.x
-            dy= i[1] - vehicle_position.y
-            rotated_point.x=cos(self.vehicle_yaw)*dx + sin(self.vehicle_yaw)*dy 
-            # rotated_x axis = tangential (head_dir)
-            rotated_point.y=sin(self.vehicle_yaw)*dx - cos(self.vehicle_yaw)*dy
-            # rotated_y axis = normal
-            theta=atan2(rotated_point.y,rotated_point.x)
-            if rotated_point.x>0 :
-                dis=sqrt(pow(rotated_point.x,2)+pow(rotated_point.y,2))
+            path_point = i
+            rel_x= i[0] - vehicle_position.x
+            rel_y= i[1] - vehicle_position.y
+            dot_x = rel_x*cos(self.vehicle_yaw) + rel_y*sin(self.vehicle_yaw)
+            dot_y = rel_x*sin(self.vehicle_yaw) - rel_y*cos(self.vehicle_yaw)
+            dis=sqrt(pow(dot_x,2)+pow(dot_y,2))
+            mag = dis
+            if dot_x >0 :
                 if dis>= self.lfd :
                     self.lfd=self.current_vel*0.3
                     if self.lfd < self.min_lfd : 
@@ -91,10 +88,15 @@ class purePursuit :
                     self.is_look_forward_point=True
                     break
         
+        if dot_y > 0:
+            alpha=acos(dot_x/mag)
+        else:
+            alpha=-1*acos(dot_x/mag)
         
-        print("theta :",theta)
+        
+        print('alpha :',alpha)
         if self.is_look_forward_point :
-            self.steering=atan2((2*self.vehicle_length*sin(theta)),self.lfd)
+            self.steering=atan2((2*self.vehicle_length*sin(alpha)),self.lfd)
             return self.steering #deg
         else : 
             print("There is no waypoint at front")
@@ -129,6 +131,3 @@ def findLocalPath(ref_path,position_x,position_y):
         out_path.append(pose)
 
     return out_path,current_waypoint
-      
-
-    
