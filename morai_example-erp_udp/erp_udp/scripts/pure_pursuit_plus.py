@@ -14,14 +14,13 @@ path = os.path.dirname( os.path.abspath( __file__ ) )  # current file's path
 
 ## define variables
 change_rad_deg = 180/pi   # change radian scale to degree scale
-threshold = 6            # avoid threshold between car and object
+threshold = 7            # avoid threshold between car and object
 first_head = 0            # memory variable for first(return) heading angle
 ctn = 0                   # only for take first heading angle
 return_rate = 1           # return steering angle 
 avoid_rate = 1            # avoid steer angle
 threshold_deg = 130       # when car avoids object it will maintane steer until degree become threshold deg
 threshold_head = 5        # after the event, car's heading will return to first heading
-
 with open(os.path.join(path,("params.json")),'r') as fp :  # current path + file name
     params = json.load(fp) 
 
@@ -60,20 +59,23 @@ class ppplus :
     def main_loop(self):
         global ctn 
         global first_head
+
         self.timer=threading.Timer(0.001,self.main_loop)
         self.timer.start()
         
         status_data=self.status.get_data()
         obj_data=self.obj.get_data()
-        obj_data= obj_data[0]
-
-        obj_pos_x = obj_data[2]
-        obj_pos_y = obj_data[3]
         position_x=status_data[12]
         position_y=status_data[13]
         position_z=status_data[14]
         heading=status_data[17]     # degree
         velocity=status_data[18]
+
+        obj_data= obj_data[0]
+        obj_pos_x = obj_data[2]
+        obj_pos_y = obj_data[3]
+        
+
 
     
         local_path,current_point =findLocalPath(self.global_path,position_x,position_y)
@@ -82,7 +84,7 @@ class ppplus :
         self.pure_pursuit.getEgoStatus(position_x,position_y,position_z,velocity,heading)
 
         
-        len_ob2car = sqrt(pow((obj_pos_x - position_x),2) + pow((obj_pos_y - position_y),2))
+
         ctrl_mode = 2 # 2 = AutoMode / 1 = KeyBoard
         Gear = 4 # 4 1 : (P / parking ) 2 (R / reverse) 3 (N / Neutral)  4 : (D / Drive) 5 : (L)
         cmd_type = 1 # 1 : Throttle  /  2 : Velocity  /  3 : Acceleration        
@@ -93,6 +95,7 @@ class ppplus :
 
         steering_angle=self.pure_pursuit.steering_angle() # deg
         #print(steering_angle)
+        len_ob2car = sqrt(pow((obj_pos_x - position_x),2) + pow((obj_pos_y - position_y),2))
         
         if len_ob2car < threshold:
             if ctn == 0:
