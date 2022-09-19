@@ -71,13 +71,7 @@ class ppplus :
         heading=status_data[17]     # degree
         velocity=status_data[18]
 
-        obj_data= obj_data[0]
-        obj_pos_x = obj_data[2]
-        obj_pos_y = obj_data[3]
         
-
-
-    
         local_path,current_point =findLocalPath(self.global_path,position_x,position_y)
         #####
         self.pure_pursuit.getPath(local_path)
@@ -95,33 +89,38 @@ class ppplus :
 
         steering_angle=self.pure_pursuit.steering_angle() # deg
         #print(steering_angle)
-        len_ob2car = sqrt(pow((obj_pos_x - position_x),2) + pow((obj_pos_y - position_y),2))
-        
-        if len_ob2car < threshold:
-            if ctn == 0:
-                first_head = heading
-            x = position_x - obj_pos_x
-            y = position_y - obj_pos_y
-            rad = atan2(y,x)
-            deg = rad*change_rad_deg-heading
-            ctn = ctn +1
-            if deg > 180:         # make degree beloing in -180 to 180
-                    deg = deg - 360
-            elif deg < -180:
-                deg = 360 + deg
 
-            deg_m = abs(deg)
-            if deg_m > threshold_deg:
-                if deg > 0 :
-                    steering_angle= -1*avoid_rate
-                
-                else:
-                    steering_angle= avoid_rate
+        if obj_data != []:
+            obj_data= obj_data[0]
+            obj_pos_x = obj_data[2]
+            obj_pos_y = obj_data[3]
+            len_ob2car = sqrt(pow((obj_pos_x - position_x),2) + pow((obj_pos_y - position_y),2))
+
+            if len_ob2car < threshold:
+                if ctn == 0:
+                    first_head = heading
+                x = position_x - obj_pos_x
+                y = position_y - obj_pos_y
+                rad = atan2(y,x)
+                deg = rad*change_rad_deg-heading
+                ctn = ctn +1
+                if deg > 180:         # make degree beloing in -180 to 180
+                        deg = deg - 360
+                elif deg < -180:
+                    deg = 360 + deg
+
+                deg_m = abs(deg)
+                if deg_m > threshold_deg:
+                    if deg > 0 :
+                        steering_angle= -1*avoid_rate
+
+                    else:
+                        steering_angle= avoid_rate
 
         
-            if steering_angle == 0:
-                if heading > first_head + threshold_head or heading < first_head - threshold_head:
-                    steering_angle = return_rate*abs(heading-60)/(heading-60)
+                if steering_angle == 0:
+                    if heading > first_head + threshold_head or heading < first_head - threshold_head:
+                        steering_angle = return_rate*abs(heading-60)/(heading-60)
 
 
         self.ctrl_cmd.send_data([ctrl_mode,Gear,cmd_type,send_velocity,acceleration,accel,brake,steering_angle])
