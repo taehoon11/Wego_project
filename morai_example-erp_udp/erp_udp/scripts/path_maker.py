@@ -66,9 +66,9 @@ class path_maker :
         
         status_data=self.status.get_data()
         #print(status_data)
-        position_x=status_data[0]
-        position_y=status_data[1]
-        position_z=status_data[2]
+        position_x=status_data[12]
+        position_y=status_data[13]
+        position_z=status_data[14]
 
         
         distance = sqrt(pow(position_x-self.prev_x,2)+pow(position_y-self.prev_y,2))

@@ -39,3 +39,4 @@ xf = abs(pos_x[0]-pos_x[-1])
 angle = m.acos(xf/l)
 deg = (angle*180)/m.pi
 print(deg)
+

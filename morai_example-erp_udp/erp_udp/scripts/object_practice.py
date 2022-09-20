@@ -1,23 +1,3 @@
-from math import atan2,pi,sin,cos,pow,sqrt
-
-TH = 10
-a = [3,7]
-b = [0,3]
-x = b[0] - a[0]
-y = b[1] - a[1]
-L = sqrt(pow(x,2)+pow(y,2))
-bl = TH - L
-
-
-r2d = 180/pi
-c = atan2(y,x)
-x1= bl*cos(c) + x
-y1= bl*sin(c) + y
-
-
-k = [1,2,3,4,5,6,7,7,8,9,9,9,9,0,24]
-print(max(k))
-"""
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys
@@ -67,22 +47,23 @@ class obj :
             obj_data=self.obj.get_data()
             position_x=status_data[12]
             position_y=status_data[13]
+            position_z=status_data[14]
             heading=status_data[17]     # degree
             velocity=status_data[18]
-            obj_data=self.obj.get_data()
-            obj_data= obj_data[0]
-            obj_pos_x = obj_data[2]
-            obj_pos_y = obj_data[3]
- 
-            
-
-            x = position_x - obj_pos_x
-            y = position_y - obj_pos_y
-
-        
-            rad = atan2(y,x)
-            deg = rad*change_rad_deg
-            print(deg)
+            #obj_data=self.obj.get_data()
+            #obj_data= obj_data[0]
+            #obj_pos_x = obj_data[2]
+            #obj_pos_y = obj_data[3]
+ #
+            #
+#
+            #x = position_x - obj_pos_x
+            #y = position_y - obj_pos_y
+#
+        #
+            #rad = atan2(y,x)
+            #deg = rad*change_rad_deg
+            print(position_z)
 
 if __name__ == "__main__":
 
@@ -92,4 +73,3 @@ if __name__ == "__main__":
         pass
 
 
-"""

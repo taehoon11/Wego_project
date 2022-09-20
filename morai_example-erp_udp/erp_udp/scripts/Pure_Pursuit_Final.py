@@ -3,7 +3,7 @@
 import sys
 import numpy as np
 from lib.morai_udp_parser import udp_parser,udp_sender
-from lib.utils import pathReader,findLocalPath,purePursuit,Point
+from lib.utils4ppfinal import pathReader,findLocalPath,purePursuit,Point
 from math import cos,sin,sqrt,pow,atan2,pi
 import time
 import threading
@@ -12,7 +12,10 @@ import os,json
 
 path = os.path.dirname( os.path.abspath( __file__ ) )  # current file's path
 len_ob2car = float("inf")
-
+ctn = 0
+local_path = []
+len_ob2car = float("inf")
+Avoid_Radius = 0
 with open(os.path.join(path,("params.json")),'r') as fp :  # current path + file name
     params = json.load(fp) 
 
@@ -49,7 +52,10 @@ class ppfinal :
 
     
     def main_loop(self):
+        global ctn
         global len_ob2car
+        global local_path
+        global Avoid_Radius
         self.timer=threading.Timer(0.001,self.main_loop)
         self.timer.start()
         
@@ -67,30 +73,24 @@ class ppfinal :
             obj_pos_y = obj_data[3]
             obj_size_x = obj_data[6]
             obj_size_y = obj_data[7]
-
             Avoid_Radius = sqrt(pow(obj_size_x,2)+pow(obj_size_y,2))
             len_ob2car = sqrt(pow((obj_pos_x - position_x),2) + pow((obj_pos_y - position_y),2)) 
+            if ctn == 0:
+                ctn = ctn + 1
+                local_path,current_point =findLocalPath(self.global_path,position_x,position_y,Avoid_Radius,obj_pos_x,obj_pos_y)
+
+        print(local_path)
+        #print(local_path)
+        if len_ob2car <= Avoid_Radius+5: 
+            self.pure_pursuit.getPath(local_path)
+
+        
 
 
-        local_path,current_point =findLocalPath(self.global_path,position_x,position_y)
-
-        for i in range(len(local_path)):
-            waypoint = local_path[i]
-            dist = sqrt(pow((waypoint[0]-obj_pos_x),2)+pow((waypoint[1]-obj_pos_y),2))
-            print(dist)
-            if dist <= Avoid_Radius:
-                newpoint_x = waypoint[0] - obj_pos_x
-                newpoint_y = waypoint[1] - obj_pos_y
-                L = sqrt(pow(newpoint_x,2)+pow(newpoint_y,2))
-                slid_ang = atan2(newpoint_y,newpoint_x)
-                newpoint_x = (Avoid_Radius-L+10000)*cos(slid_ang) + newpoint_x
-                newpoint_y = (Avoid_Radius-L+10)*sin(slid_ang) + newpoint_y
-                local_path[i] = [newpoint_x,newpoint_y]
+        else:
+            self.pure_pursuit.getPath(self.global_path)
 
 
-
-        self.pure_pursuit.getPath(local_path)
-        self.pure_pursuit.getPath(self.global_path)
         self.pure_pursuit.getEgoStatus(position_x,position_y,position_z,velocity,heading)
 
         
