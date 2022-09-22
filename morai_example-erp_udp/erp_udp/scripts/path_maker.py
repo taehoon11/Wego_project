@@ -38,10 +38,8 @@ class path_maker :
         #print("____________________")
         #print(self.file_path)
         
-        full_path = self.file_path+'/'+path_folder_name+'/'+path_file_name
-        print("_____________________")
-        print(full_path)
-        self.f=open(full_path, 'w')
+        self.full_path = self.file_path+'/'+path_folder_name+'/'+path_file_name
+        
 
         self.prev_x = 0
         self.prev_y = 0
@@ -63,6 +61,9 @@ class path_maker :
     def main_loop(self):
         self.timer=threading.Timer(0.10,self.main_loop)
         self.timer.start()
+        print("_____________________")
+        print(self.full_path)
+        f=open(self.full_path, 'a')
         
         status_data=self.status.get_data()
         #print(status_data)
@@ -74,10 +75,11 @@ class path_maker :
         distance = sqrt(pow(position_x-self.prev_x,2)+pow(position_y-self.prev_y,2))
         if distance > 0.3 :
             data = '{0}\t{1}\t{2}\n'.format(position_x,position_y,position_z)
-            self.f.write(data)
+            f.write(data)
             self.prev_x = position_x
             self.prev_y = position_y
             print(position_x,position_y)
+            f.close()
 
 
 

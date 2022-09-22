@@ -24,12 +24,13 @@ class pathReader :
         line=openFile.readlines()
 
         for i in line :
-            pose=[]
-            postion=i.split()
-            pose.append(float(postion[0]))
-            pose.append(float(postion[1]))
-            pose.append(float(postion[2]))
-            out_path.append(pose)
+            if i != "":
+                pose=[]
+                postion=i.split()
+                pose.append(float(postion[0]))
+                pose.append(float(postion[1]))
+                pose.append(float(postion[2]))
+                out_path.append(pose)
             
         openFile.close()
         return out_path

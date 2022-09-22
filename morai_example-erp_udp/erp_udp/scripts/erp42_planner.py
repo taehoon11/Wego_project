@@ -35,7 +35,7 @@ class planner :
   
 
         self.txt_reader=pathReader()
-        self.global_path=self.txt_reader.read('kcity.txt')  # read method >> load x,y,z coord of global path
+        self.global_path=self.txt_reader.read('test_path.txt')  # read method >> load x,y,z coord of global path
 
         self.pure_pursuit=purePursuit() 
   
