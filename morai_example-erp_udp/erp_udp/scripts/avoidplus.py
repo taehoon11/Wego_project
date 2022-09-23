@@ -14,10 +14,10 @@ path = os.path.dirname( os.path.abspath( __file__ ) )
 
 ## define variables
 change_rad_deg = 180/pi   # change radian scale to degree scale
-threshold = 6            # avoid threshold between car and object
+threshold = 5            # avoid threshold between car and object
 first_head = 0            # memory variable for first(return) heading angle
 ctn = 0                   # only for take first heading angle
-return_rate = 1           # return steering angle 
+return_rate = 0.4           # return steering angle 
 avoid_rate = 1            # avoid steer angle
 threshold_deg = 130       # when car avoids object it will maintane steer until degree become threshold deg
 threshold_head = 5        # after the event, car's heading will return to first heading

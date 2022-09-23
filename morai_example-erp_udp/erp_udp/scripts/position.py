@@ -49,12 +49,12 @@ class position :
     
     def main_loop(self):
         #self.timer=threading.Timer(0.10,self.main_loop)
-        #self.timer.start()
+        #self.timer.start()ssssss
         while True :
             status_data=self.status.get_data()
             #print(status_data)
-            position_x=status_data[0]
-            position_y=status_data[1]
+            position_x=status_data[12]
+            position_y=status_data[13]
             #wwwwwwwwwwwwwwwwwposition_z=status_data[2]
             #print("position x :{}, position_y : {}".format(position_x,position_y))
             position = "{} {}".format(position_x, position_y)

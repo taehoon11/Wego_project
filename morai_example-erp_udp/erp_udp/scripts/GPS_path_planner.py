@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 import sys
 import numpy as np
+from lib.gps_util import UDP_GPS_Parser
 from lib.morai_udp_parser import udp_parser,udp_sender
-from lib.utils4ppfinal import pathReader,findLocalPath,purePursuit,Point
+from lib.GPS_PPutil import pathReader,findLocalPath,purePursuit,Point
 from math import cos,sin,sqrt,pow,atan2,pi
+from pyproj import Transformer
 import time
 import threading
 import os,json
@@ -14,15 +16,16 @@ path = os.path.dirname( os.path.abspath( __file__ ) )  # current file's path
 len_ob2car = float("inf")
 ctn = 0
 local_path = []
-len_ob2car = float("inf")
 Avoid_Radius = 0
+
+
 with open(os.path.join(path,("params.json")),'r') as fp :  # current path + file name
     params = json.load(fp) 
 
 params=params["params"]
 user_ip = params["user_ip"]
 host_ip = params["host_ip"]
-
+gps_port = params["gps_dst_port"]
 
 
 class ppfinal :
@@ -31,10 +34,9 @@ class ppfinal :
         self.status=udp_parser(user_ip, params["vehicle_status_dst_port"],'erp_status')
         self.obj=udp_parser(user_ip, params["object_info_dst_port"],'erp_obj')
         self.ctrl_cmd=udp_sender(host_ip,params["ctrl_cmd_host_port"],'erp_ctrl_cmd')
-
+        self.gps_parser=UDP_GPS_Parser(user_ip, gps_port,'GPRMC')
         self.txt_reader=pathReader()
-        self.global_path=self.txt_reader.read('kcity.txt')  # read method >> load x,y,z coord of global path
-
+        self.global_path=self.txt_reader.read('test_path.txt')  # read method >> load x,y coord of global path
         self.pure_pursuit=purePursuit() 
   
 
@@ -61,8 +63,13 @@ class ppfinal :
         
         status_data=self.status.get_data()
         obj_data=self.obj.get_data()
-        position_x=status_data[12]
-        position_y=status_data[13]
+
+        latitude= self.gps_parser.parsed_data[0]
+        longitude= self.gps_parser.parsed_data[1]
+
+        transformer = Transformer.from_crs("epsg:4326", "epsg:5186")
+        position_y,position_x = transformer.transform(latitude,longitude)
+
         position_z=status_data[14]
         heading=status_data[17]     # degree
         velocity=status_data[18]
@@ -79,14 +86,14 @@ class ppfinal :
                 ctn = ctn + 1
                 local_path,current_point =findLocalPath(self.global_path,position_x,position_y,Avoid_Radius,obj_pos_x,obj_pos_y)
 
-        if len_ob2car <= Avoid_Radius+5: 
-            self.pure_pursuit.getPath(local_path)
+        #if len_ob2car <= Avoid_Radius+5: 
+        #    self.pure_pursuit.getPath(local_path)
 
         
 
 
-        else:
-            self.pure_pursuit.getPath(self.global_path)
+        
+        self.pure_pursuit.getPath(self.global_path)
 
 
         self.pure_pursuit.getEgoStatus(position_x,position_y,position_z,velocity,heading)
@@ -115,3 +122,4 @@ if __name__ == "__main__":
     kicty=ppfinal()
     while True :
         pass
+ 

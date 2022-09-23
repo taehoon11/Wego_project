@@ -1,6 +1,7 @@
 import os
 from math import cos,sin,sqrt,pow,atan2,acos,pi
 
+
 class Point() :
     def __init__(self):
         self.x = 0
@@ -28,7 +29,6 @@ class pathReader :
             postion=i.split()
             pose.append(float(postion[0]))
             pose.append(float(postion[1]))
-            pose.append(float(postion[2]))
             out_path.append(pose)
             
         openFile.close()
@@ -156,4 +156,3 @@ def findLocalPath(ref_path,position_x,position_y,Avoid_Radius,obj_pos_x,obj_pos_
     #    out_path.append(pose)
 
     return out_path,current_waypoint
-      

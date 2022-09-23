@@ -20,12 +20,14 @@ params=params["params"]
 user_ip = params["user_ip"]
 status_port = params["vehicle_status_dst_port"]
 gps_port = params["gps_dst_port"]
+gps_port2 = params["gps_dst_port2"]
 
 class position :
 
     def __init__(self):
         self.status=udp_parser(user_ip, params["vehicle_status_dst_port"],'erp_status')
         self.gps_parser=UDP_GPS_Parser(user_ip, gps_port,'GPRMC')
+        self.gps_parser2=UDP_GPS_Parser(user_ip, gps_port2,'GPRMC')
         self._is_status=False
         print(not self._is_status)
         
@@ -49,24 +51,18 @@ class position :
                 status_data=self.status.get_data()
                 latitude= self.gps_parser.parsed_data[0]
                 longitude= self.gps_parser.parsed_data[1]
+                latitude2= self.gps_parser2.parsed_data[0]
+                longitude2= self.gps_parser2.parsed_data[1]
+                heading = status_data[17]
 
-                if temp_lat == 0:
-                    temp_lat = latitude
-                    temp_long = longitude
-                    heading = 1
-
-                else:
-                    transformer = Transformer.from_crs("epsg:4326", "epsg:5186")
-                    transformer2 = Transformer.from_crs("epsg:4326", "epsg:5186")
-                    y,x = transformer.transform(latitude,longitude)
-                    y2,x2 = transformer2.transform(temp_lat,temp_long)
-                    nx = x - x2
-                    ny = y-y2
-                    heading = atan2(nx,ny)*180/pi
-                    temp_lat = latitude
-                    temp_long = longitude
-
-                    print(nx,ny)
+                transformer = Transformer.from_crs("epsg:4326", "epsg:5186")
+                transformer2 = Transformer.from_crs("epsg:4326", "epsg:5186")
+                y,x = transformer.transform(latitude,longitude)
+                y2,x2 = transformer2.transform(latitude2,longitude2)
+                nx = x2-x
+                ny = y2-y
+                head = atan2(ny,nx)*180/pi
+                print(head -heading)
                     
 
                 
