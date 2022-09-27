@@ -77,12 +77,11 @@ class purePursuit :
             dis=sqrt(pow(dot_x,2)+pow(dot_y,2))
             mag = dis
             if dot_x >0 :
-                if dis>= self.lfd:
-                    self.lfd = self.current_vel*0.25
-                    if self.lfd < self.min_lfd : 
-                        self.lfd=self.min_lfd
-                    elif self.lfd> self.max_lfd :
-                        self.lfd=self.max_lfd
+                if dis>= self.current_vel*0.25:
+                    if dis < self.min_lfd : 
+                        dis=self.min_lfd
+                    elif dis> self.max_lfd :
+                        dis=self.max_lfd
                     self.forward_point=path_point
                     self.is_look_forward_point=True
                     break
@@ -95,7 +94,7 @@ class purePursuit :
         
         print('alpha :',alpha)
         if self.is_look_forward_point :
-            self.steering=atan2((2*self.vehicle_length*sin(alpha)),self.lfd)
+            self.steering=atan2((2*self.vehicle_length*sin(alpha)),dis)
             return self.steering #deg
         else : 
             print("There is no waypoint at front")
