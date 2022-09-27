@@ -28,7 +28,7 @@ class pathReader :
             postion=i.split()
             pose.append(float(postion[0]))
             pose.append(float(postion[1]))
-            pose.append(float(postion[2]))
+            #pose.append(float(postion[2]))
             out_path.append(pose)
             
         openFile.close()
@@ -77,11 +77,11 @@ class purePursuit :
             dis=sqrt(pow(dot_x,2)+pow(dot_y,2))
             mag = dis
             if dot_x >0 :
-                if dis>= self.lfd :
-                    self.lfd=self.current_vel*0.3
+                if dis>= self.lfd:
+                    self.lfd = self.current_vel*0.25
                     if self.lfd < self.min_lfd : 
                         self.lfd=self.min_lfd
-                    elif self.lfd > self.max_lfd :
+                    elif self.lfd> self.max_lfd :
                         self.lfd=self.max_lfd
                     self.forward_point=path_point
                     self.is_look_forward_point=True

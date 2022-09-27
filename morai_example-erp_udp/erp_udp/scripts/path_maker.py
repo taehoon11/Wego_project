@@ -3,7 +3,7 @@ import time
 import threading
 from math import cos,sin,sqrt,pow,atan2,pi
 import os,json
-import sys
+#import sys
 
 path = os.path.dirname( os.path.abspath( __file__ ) )
 
@@ -16,31 +16,15 @@ status_port = params["vehicle_status_dst_port"]
 path_folder_name = params["make_path_folder_name"]
 path_file_name = params["make_path_file_name"]
 
-"""
-print("_______________")
-print(path_folder_name)
-print("_______________")
-print(path_file_name)
-print("_______________")
-print(status_port)
-"""
-
-# /
-
 class path_maker :
 
     def __init__(self):
         self.status=udp_parser(user_ip, params["vehicle_status_dst_port"],'erp_status')
-        #print(self.status)
         self.file_path=os.path.dirname( os.path.abspath( __file__ ) )
-        #print(self.file_path)
         self.file_path = os.path.normpath(os.path.join(self.file_path, '..'))
-        #print("____________________")
-        #print(self.file_path)
+
         
         self.full_path = self.file_path+'/'+path_folder_name+'/'+path_file_name
-        
-
         self.prev_x = 0
         self.prev_y = 0
         
@@ -54,19 +38,17 @@ class path_maker :
                 self._is_status=True
 
         self.main_loop()
-        # self.f.close()
 
 
     
     def main_loop(self):
         self.timer=threading.Timer(0.10,self.main_loop)
         self.timer.start()
-        print("_____________________")
-        print(self.full_path)
+        #print("_____________________")
+        #print(self.full_path)
         f=open(self.full_path, 'a')
         
         status_data=self.status.get_data()
-        #print(status_data)
         position_x=status_data[12]
         position_y=status_data[13]
         position_z=status_data[14]

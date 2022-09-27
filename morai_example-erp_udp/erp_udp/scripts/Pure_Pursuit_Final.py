@@ -33,7 +33,7 @@ class ppfinal :
         self.ctrl_cmd=udp_sender(host_ip,params["ctrl_cmd_host_port"],'erp_ctrl_cmd')
 
         self.txt_reader=pathReader()
-        self.global_path=self.txt_reader.read('kcity.txt')  # read method >> load x,y,z coord of global path
+        self.global_path=self.txt_reader.read('test_path.txt')  # read method >> load x,y,z coord of global path
 
         self.pure_pursuit=purePursuit() 
   
