@@ -3,7 +3,7 @@
 import sys
 import numpy as np
 from lib.morai_udp_parser import udp_parser,udp_sender
-from lib.utils import pathReader,findLocalPath,purePursuit,Point
+from lib.util import pathReader,findLocalPath,purePursuit,Point
 from math import cos,sin,sqrt,pow,atan2,pi
 import time
 import threading
@@ -27,11 +27,7 @@ class planner :
 
     def __init__(self):
         self.status=udp_parser(user_ip, params["vehicle_status_dst_port"],'erp_status')
-        self.obj=udp_parser(user_ip, params["object_info_dst_port"],'erp_obj')
-        self.traffic=udp_parser(user_ip, params["get_traffic_dst_port"],'get_traffic')
-
         self.ctrl_cmd=udp_sender(host_ip,params["ctrl_cmd_host_port"],'erp_ctrl_cmd')
-        self.set_traffic=udp_sender(host_ip,params["set_traffic_host_port"],'set_traffic')
   
 
         self.txt_reader=pathReader()
@@ -58,9 +54,6 @@ class planner :
         self.timer.start()
         
         status_data=self.status.get_data()
-        obj_data=self.obj.get_data()
-        traffic_data=self.traffic.get_data()
-
         position_x=status_data[12]
         position_y=status_data[13]
         position_z=status_data[14]
@@ -70,8 +63,9 @@ class planner :
     
         local_path,current_point =findLocalPath(self.global_path,position_x,position_y)
         #####
-        self.pure_pursuit.getPath(local_path)
+        self.pure_pursuit.getPath(self.global_path)
         self.pure_pursuit.getEgoStatus(position_x,position_y,position_z,velocity,heading)
+
 
         
 
@@ -86,14 +80,8 @@ class planner :
         brake=0
 
         steering_angle=self.pure_pursuit.steering_angle() # deg
-        #print(steering_angle)
         
-        self.ctrl_cmd.send_data([ctrl_mode,Gear,cmd_type,send_velocity,acceleration,accel,brake,steering_angle])
-        
-        if not len(traffic_data) == 0 :
-            self.set_traffic.send_data([traffic_data[0],16])
-
-      
+        self.ctrl_cmd.send_data([ctrl_mode,Gear,cmd_type,send_velocity,acceleration,accel,brake,steering_angle])     
 
 if __name__ == "__main__":
 
@@ -101,9 +89,3 @@ if __name__ == "__main__":
     kicty=planner()
     while True :
         pass
- 
-
-
-
-
-

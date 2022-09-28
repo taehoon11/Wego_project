@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import sys
+#import sys
 import numpy as np
 from lib.morai_udp_parser import udp_parser,udp_sender
 from lib.utils4ppfinal import pathReader,findLocalPath,purePursuit,Point
@@ -33,7 +33,7 @@ class ppfinal :
         self.ctrl_cmd=udp_sender(host_ip,params["ctrl_cmd_host_port"],'erp_ctrl_cmd')
 
         self.txt_reader=pathReader()
-        self.global_path=self.txt_reader.read('test_path.txt')  # read method >> load x,y,z coord of global path
+        self.global_path=self.txt_reader.read('kcity.txt')  # read method >> load x,y,z coord of global path
 
         self.pure_pursuit=purePursuit() 
   

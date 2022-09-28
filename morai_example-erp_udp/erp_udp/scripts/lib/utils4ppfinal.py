@@ -28,7 +28,7 @@ class pathReader :
             postion=i.split()
             pose.append(float(postion[0]))
             pose.append(float(postion[1]))
-            #pose.append(float(postion[2]))
+            pose.append(float(postion[2]))
             out_path.append(pose)
             
         openFile.close()
@@ -67,7 +67,6 @@ class purePursuit :
     def steering_angle(self):
         vehicle_position=self.current_postion
         self.is_look_forward_point= False
-        mag = float("inf")
         for i in self.path :
             path_point = i
             rel_x= i[0] - vehicle_position.x
@@ -75,24 +74,27 @@ class purePursuit :
             dot_x = rel_x*cos(self.vehicle_yaw) + rel_y*sin(self.vehicle_yaw)
             dot_y = rel_x*sin(self.vehicle_yaw) - rel_y*cos(self.vehicle_yaw)
             dis=sqrt(pow(dot_x,2)+pow(dot_y,2))
-            mag = dis
+            alpha=atan2(dot_y,dot_x)
+            #if dot_y > 0:
+            #    alpha=acos(dot_x/dis)
+            #else:
+            #    alpha=-1*acos(dot_x/dis)
             if dot_x >0 :
-                if dis>= self.current_vel*0.25:
+                if dis>= self.current_vel*0.3:
+                    dis = self.current_vel*0.3
                     if dis < self.min_lfd : 
                         dis=self.min_lfd
                     elif dis> self.max_lfd :
                         dis=self.max_lfd
                     self.forward_point=path_point
                     self.is_look_forward_point=True
+                    print(self.forward_point)
                     break
         
-        if dot_y > 0:
-            alpha=acos(dot_x/mag)
-        else:
-            alpha=-1*acos(dot_x/mag)
+
         
         
-        print('alpha :',alpha)
+        #print('alpha :',alpha)
         if self.is_look_forward_point :
             self.steering=atan2((2*self.vehicle_length*sin(alpha)),dis)
             return self.steering #deg
