@@ -90,6 +90,7 @@ class purePursuit :
                         self.lfd=self.max_lfd
                     self.forward_point=path_point
                     self.is_look_forward_point=True
+                    print(self.forward_point)
                     break
         
         

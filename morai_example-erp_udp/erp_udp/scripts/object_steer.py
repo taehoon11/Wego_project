@@ -1,9 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-import sys
-import numpy as np
 from lib.morai_udp_parser import udp_parser,udp_sender
-from lib.utils import pathReader,findLocalPath,purePursuit,Point
 from math import cos,sin,sqrt,pow,atan2,pi
 import time
 import threading
@@ -14,12 +9,11 @@ path = os.path.dirname( os.path.abspath( __file__ ) )
 
 ## define variables
 change_rad_deg = 180/pi   # change radian scale to degree scale
-threshold = 5            # avoid threshold between car and object
 first_head = 0            # memory variable for first(return) heading angle
 ctn = 0                   # only for take first heading angle
 return_rate = 0.4           # return steering angle 
-avoid_rate = 1            # avoid steer angle
-threshold_deg = 130       # when car avoids object it will maintane steer until degree become threshold deg
+avoid_rate = 0.4            # avoid steer angle
+threshold_deg = 140      # when car avoids object it will maintane steer until degree become threshold deg
 threshold_head = 5        # after the event, car's heading will return to first heading
 
 with open(os.path.join(path,("params.json")),'r') as fp :
@@ -37,8 +31,7 @@ class go_straight :
         self.status=udp_parser(user_ip, params["vehicle_status_dst_port"],'erp_status')
         self.obj=udp_parser(user_ip, params["object_info_dst_port"],'erp_obj')
         self.ctrl_cmd=udp_sender(host_ip,params["ctrl_cmd_host_port"],'erp_ctrl_cmd')
-        #self.traffic=udp_parser(user_ip, params["get_traffic_dst_port"],'get_traffic')
-  
+        self.safe_distance = 5
         self._is_status=False
         while not self._is_status :
             if not self.status.get_data() :
@@ -63,11 +56,16 @@ class go_straight :
         obj_data= obj_data[0]
         
         
-        obj_pos_x = obj_data[2]
-        obj_pos_y = obj_data[3]
-        position_x=status_data[12]
-        position_y=status_data[13]
-        heading=status_data[17]# degree
+        obj_pos_x = obj_data[2]      # 장애물 x 좌표
+        obj_pos_y = obj_data[3]      # 장애물 y 좌표
+        obj_size_x = obj_data[6]     # 장애물 x 축 방향 길이(가로)
+        obj_size_y = obj_data[7]     # 장애물 y 축 방향 길이(세로)
+        position_x=status_data[12]   # 차량의 현재 x 좌표
+        position_y=status_data[13]   # 차량의 현재 y 좌표
+        heading=status_data[17]
+
+        car2obj_dis = sqrt(pow((obj_pos_x - position_x),2) + pow((obj_pos_y - position_y),2))
+        threshold = sqrt(pow(obj_size_x,2)+pow(obj_size_y,2)) + self.safe_distance
 
         if ctn == 0:
             first_head = heading
@@ -86,9 +84,9 @@ class go_straight :
 
         deg_m = abs(deg)
         
-
+        print(deg)
         
-        len_ob2car = sqrt(pow((obj_pos_x - position_x),2) + pow((obj_pos_y - position_y),2))
+
         ctrl_mode = 2
         Gear = 4
         cmd_type = 1
@@ -98,11 +96,10 @@ class go_straight :
         brake=0
         steering_angle=0
       
-        
-        #print(deg)    
+ 
               
         
-        if len_ob2car < threshold and deg_m > threshold_deg:
+        if car2obj_dis < threshold and deg_m > threshold_deg:
             if deg > 0 :
                 steering_angle= -1*avoid_rate
                 

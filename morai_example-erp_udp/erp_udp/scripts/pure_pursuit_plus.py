@@ -3,14 +3,14 @@
 import sys
 import numpy as np
 from lib.morai_udp_parser import udp_parser,udp_sender
-from lib.utils import pathReader,findLocalPath,purePursuit,Point
+from lib.util import pathReader,findLocalPath,purePursuit,Point
 from math import cos,sin,sqrt,pow,atan2,pi
 import time
 import threading
 import os,json
 
 
-path = os.path.dirname( os.path.abspath( __file__ ) )  # current file's path
+path = os.path.dirname( os.path.abspath( __file__ ) )  # current file's pathw
 
 ## define variables
 change_rad_deg = 180/pi   # change radian scale to degree scale

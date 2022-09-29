@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#import sys
 import numpy as np
 from lib.morai_udp_parser import udp_parser,udp_sender
 from lib.util import pathReader,findLocalPath,purePursuit,Point
@@ -77,7 +74,7 @@ class ppfinal :
             len_ob2car = sqrt(pow((obj_pos_x - position_x),2) + pow((obj_pos_y - position_y),2)) 
             if ctn == 0:
                 ctn = ctn + 1
-                local_path,current_point =findLocalPath(self.global_path,position_x,position_y,Avoid_Radius,obj_pos_x,obj_pos_y)
+                local_path =findLocalPath(self.global_path,Avoid_Radius,obj_pos_x,obj_pos_y)
 
         if len_ob2car <= Avoid_Radius+7: 
             self.pure_pursuit.getPath(local_path)

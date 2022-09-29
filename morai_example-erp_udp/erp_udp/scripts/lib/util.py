@@ -99,30 +99,40 @@ class purePursuit :
         
 
 
-def findLocalPath(ref_path,position_x,position_y):
+def findLocalPath(ref_path,Avoid_Radius,obj_pos_x,obj_pos_y):
     out_path=[]
-    current_x=position_x
-    current_y=position_y
-    current_waypoint=0
-    min_dis=float('inf')
+    threshold = []
+    t_idx_min = 0
+    t_idx_max = 0
 
     for i in range(len(ref_path)) :
-        dx=current_x - ref_path[i][0]
-        dy=current_y - ref_path[i][1]
-        dis=sqrt(dx*dx + dy*dy)
-        if dis < min_dis :
-            min_dis=dis
-            current_waypoint=i
+        dx = ref_path[i][0] - obj_pos_x
+        dy = ref_path[i][1] - obj_pos_y
+        dis = sqrt(dx*dx + dy*dy)
+        if dis < Avoid_Radius+3:
+            threshold.append(i)
+    t_idx_min = min(threshold)
+    t_idx_max = max(threshold)
 
-    if current_waypoint+50 > len(ref_path) :
-        last_local_waypoint= len(ref_path)
-    else :
-        last_local_waypoint=current_waypoint+50
+    for i in range(t_idx_min,t_idx_max+300):
+        pose = []
+        dist = sqrt(pow((ref_path[i][0]-obj_pos_x),2)+pow((ref_path[i][1]-obj_pos_y),2)) 
+        if i < t_idx_max and dist <= Avoid_Radius+3:
+            newpoint_x = ref_path[i][0] - obj_pos_x
+            newpoint_y = ref_path[i][1] - obj_pos_y
+            L = sqrt(pow(newpoint_x,2)+pow(newpoint_y,2))
+            slid_ang = atan2(newpoint_y,newpoint_x)
+            newpoint_x = (Avoid_Radius-L+3)*cos(slid_ang) + newpoint_x
+            newpoint_y = (Avoid_Radius-L+3)*sin(slid_ang) + newpoint_y
+            
+            newpoint_x = newpoint_x + ref_path[i][0]
+            newpoint_y = newpoint_y + ref_path[i][1]
+            pose.append(newpoint_x)
+            pose.append(newpoint_y)
+            out_path.append(pose)      
+        else:
+            pose.append(ref_path[i][0])
+            pose.append(ref_path[i][1])              
+            out_path.append(pose)
 
-    for i in range(current_waypoint,last_local_waypoint) :
-        pose=[]
-        pose.append(ref_path[i][0])
-        pose.append(ref_path[i][1])
-        out_path.append(pose)
-
-    return out_path,current_waypoint
+    return out_path
